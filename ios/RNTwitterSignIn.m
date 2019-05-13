@@ -25,20 +25,19 @@ RCT_EXPORT_METHOD(init: (NSString *)consumerKey consumerSecret:(NSString *)consu
 {
     [[Twitter sharedInstance] startWithConsumerKey:consumerKey consumerSecret:consumerSecret];
 }
+
 RCT_EXPORT_METHOD(logIn: (RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
     [[Twitter sharedInstance] logInWithCompletion:^(TWTRSession * _Nullable session, NSError * _Nullable error) {
         if (session) {
             TWTRAPIClient *client = [TWTRAPIClient clientWithCurrentUser];
-
-            [client requestEmailForCurrentUser:^(NSString *email, NSError *error) {
-                NSString *requestedEmail = (email) ? email : @"";
+            [client loadUserWithID:session.userID completion:^(TWTRUser * _Nullable user, NSError * _Nullable error) {
                 NSDictionary *body = @{@"authToken": session.authToken,
                                        @"authTokenSecret": session.authTokenSecret,
-                                       @"userID":session.userID,
-                                       @"email": requestedEmail,
-                                       @"userName":session.userName};
+                                       @"userID":user.userID,
+                                       @"profileAvatar": user.profileImageURL,
+                                       @"userName":user.screenName};
                 resolve(body);
             }];
         } else {
