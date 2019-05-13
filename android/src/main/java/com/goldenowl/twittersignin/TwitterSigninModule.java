@@ -11,6 +11,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
+import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.DefaultLogger;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.SessionManager;
@@ -22,6 +23,7 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterAuthClient;
+import com.twitter.sdk.android.core.models.User;
 
 import java.util.Map;
 import java.util.Set;
@@ -66,25 +68,27 @@ public class TwitterSigninModule extends ReactContextBaseJavaModule implements A
                 final WritableMap map = Arguments.createMap();
                 map.putString("authToken", twitterAuthToken.token);
                 map.putString("authTokenSecret", twitterAuthToken.secret);
-                map.putString("name", session.getUserName());
                 map.putString("userID", Long.toString(session.getUserId()));
                 map.putString("userName", session.getUserName());
-                twitterAuthClient.requestEmail(session, new com.twitter.sdk.android.core.Callback<String>() {
+
+                TwitterCore.getInstance().getApiClient().getAccountService().verifyCredentials(true, true, false).enqueue(new Callback<User>() {
                     @Override
-                    public void success(Result<String> result) {
-                        map.putString("email", result.data);
+                    public void success(Result<User> result) {
+
+                        String profileImageURL = result.data.profileImageUrl;
+                        map.putString("profileAvatarURL", profileImageURL);
                         promise.resolve(map);
                     }
 
                     @Override
                     public void failure(TwitterException exception) {
-                        map.putString("email", "COULD_NOT_FETCH");
                         promise.reject(
                                 "COULD_NOT_FETCH",
                                 map.toString(),
-                                new Exception("Failed to obtain email", exception));
+                                new Exception("Twitter: Could not get user details", exception));
                     }
                 });
+
             }
 
             @Override

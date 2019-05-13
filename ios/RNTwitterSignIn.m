@@ -36,7 +36,7 @@ RCT_EXPORT_METHOD(logIn: (RCTPromiseResolveBlock)resolve
                 NSDictionary *body = @{@"authToken": session.authToken,
                                        @"authTokenSecret": session.authTokenSecret,
                                        @"userID":user.userID,
-                                       @"profileAvatar": user.profileImageURL,
+                                       @"profileAvatarURL": user.profileImageURL,
                                        @"userName":user.screenName};
                 resolve(body);
             }];
