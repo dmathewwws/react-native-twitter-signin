@@ -69,13 +69,14 @@ public class TwitterSigninModule extends ReactContextBaseJavaModule implements A
                 map.putString("authToken", twitterAuthToken.token);
                 map.putString("authTokenSecret", twitterAuthToken.secret);
                 map.putString("userID", Long.toString(session.getUserId()));
-                map.putString("userName", session.getUserName());
 
                 TwitterCore.getInstance().getApiClient().getAccountService().verifyCredentials(true, true, false).enqueue(new Callback<User>() {
                     @Override
                     public void success(Result<User> result) {
 
                         String profileImageURL = result.data.profileImageUrl;
+                        String name = result.data.name;
+                        map.putString("name", name);
                         map.putString("profileAvatarURL", profileImageURL);
                         promise.resolve(map);
                     }

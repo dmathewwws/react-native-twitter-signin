@@ -37,7 +37,7 @@ RCT_EXPORT_METHOD(logIn: (RCTPromiseResolveBlock)resolve
                                        @"authTokenSecret": session.authTokenSecret,
                                        @"userID":user.userID,
                                        @"profileAvatarURL": user.profileImageURL,
-                                       @"userName":user.screenName};
+                                       @"name":user.name};
                 resolve(body);
             }];
         } else {
