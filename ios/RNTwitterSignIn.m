@@ -20,6 +20,11 @@
 
 RCT_EXPORT_MODULE();
 
+NSString *twitterATName = @"twitterATName";
+NSString *twitterATSName = @"twitterATSName";
+NSString *twitterUName = @"twitterUName";
+NSString *twitterUIDName = @"twitterUIDName";
+
 RCT_EXPORT_METHOD(init: (NSString *)consumerKey consumerSecret:(NSString *)consumerSecret resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -31,6 +36,14 @@ RCT_EXPORT_METHOD(logIn: (RCTPromiseResolveBlock)resolve
 {
     [[Twitter sharedInstance] logInWithCompletion:^(TWTRSession * _Nullable session, NSError * _Nullable error) {
         if (session) {
+
+            [[NSUserDefaults standardUserDefaults] setObject:session.authToken forKey:twitterATName];
+            [[NSUserDefaults standardUserDefaults] setObject:session.authTokenSecret forKey:twitterATSName];
+            [[NSUserDefaults standardUserDefaults] setObject:session.userName forKey:twitterUName];
+            [[NSUserDefaults standardUserDefaults] setObject:session.userID forKey:twitterUIDName];
+
+            [[NSUserDefaults standardUserDefaults] synchronize];
+
             TWTRAPIClient *client = [TWTRAPIClient clientWithCurrentUser];
             [client loadUserWithID:session.userID completion:^(TWTRUser * _Nullable user, NSError * _Nullable error) {
                 NSDictionary *body = @{@"authToken": session.authToken,
